@@ -16,7 +16,7 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
     const data_vencimento = document.getElementById('data_vencimento').value;
 
     // Criação de um objeto com os dados do formulário
-    const formData = {
+    const produto = {
         sku,
         descricao,
         tipo,
@@ -30,21 +30,22 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
         data_vencimento
     };
 
+
     // Enviando os dados via POST para o Web App do Google Apps Script
+    // Fazer requisição POST para o Google Apps Script
     fetch("https://script.google.com/macros/s/AKfycbxM2WNFSr9VZyDibR8H4SQhApM-8t3tNFSdMP4zj_hIETjoegzudMHvVttrz8MTRS9gUA/exec", {
-        method: 'POST',
-        mode: 'no-cors', // No-cors para evitar problemas de CORS
+        method: "POST",
+        mode: "cors",  // Garantir que a requisição seja feita com o modo CORS
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify(formData) // Convertendo os dados em JSON
+        body: JSON.stringify(produto)
     })
-    .then(response => {
-        if (response.ok) {
-            alert('Produto salvo com sucesso!');
-            document.getElementById('dataForm').reset(); // Limpar o formulário
-        } else {
-            alert('Ocorreu um erro ao salvar o produto.');
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+            document.getElementById('dataForm').reset();
         }
     })
     .catch(error => {
@@ -69,3 +70,4 @@ function limparFormulario() {
 function irParaHome() {
     window.location.href = "./home.html"; // Substitua pelo caminho correto para a página inicial
 }
+
