@@ -5,6 +5,26 @@
     <title>Entrada</title>
     <link rel="shortcut icon" href="./IMAGENS/Logo Icone.ico" type="image/x-icon">
     <link rel="stylesheet" href="./ENTRADA_PRODUTOS/styles.css">
+    
+    <!-- Adicione o SDK do Firebase compatível com navegador -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjuoTIoL4CX8KSkWXos1JEYQ9u0KhySmk",
+            authDomain: "bancocozinha.firebaseapp.com",
+            databaseURL: "https://bancocozinha-default-rtdb.firebaseio.com",
+            projectId: "bancocozinha",
+            storageBucket: "bancocozinha.appspot.com",
+            messagingSenderId: "424572545119",
+            appId: "1:424572545119:web:bc20a45001fbac1cbfd3ea",
+            measurementId: "G-5J6XFE0H02"
+        };
+
+        // Inicializar o Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
     <script src="./ENTRADA_PRODUTOS/app.js" defer></script>
 </head>
 <body>
@@ -45,7 +65,7 @@
             <label for="valor_unitario">Valor Unitário (R$):</label>
             <input type="number" id="valor_unitario" required oninput="calcularValorTotal()" step="0.01">
             <label for="valor_total">Valor Total (R$):</label>
-            <input type="number" id="valor_total" required readonly>
+            <input type="number" id="valor_total" required disabled>
             <label for="fornecedor">Fornecedor:</label>
             <input type="text" id="fornecedor" required>
             <label for="data_cadastro">Data Cadastro:</label>
@@ -58,71 +78,5 @@
         </form>
         <div id="output"></div>
     </div>
-
-    <script>
-        document.getElementById('dataForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const sku = document.getElementById('sku').value;
-            const descricao = document.getElementById('descricao').value;
-            const tipo = document.getElementById('tipo').value;
-            const unidade = document.getElementById('unidade').value;
-            const grupo = document.getElementById('grupo').value;
-            const quantidade = document.getElementById('quantidade').value;
-            const valor_unitario = document.getElementById('valor_unitario').value;
-            const valor_total = document.getElementById('valor_total').value;
-            const fornecedor = document.getElementById('fornecedor').value;
-            const data_cadastro = document.getElementById('data_cadastro').value;
-            const data_vencimento = document.getElementById('data_vencimento').value;
-
-            const produto = {
-                sku,
-                descricao,
-                tipo,
-                unidade,
-                grupo,
-                quantidade,
-                valor_unitario,
-                valor_total,
-                fornecedor,
-                data_cadastro,
-                data_vencimento
-            };
-
-            // Simulando o salvamento na planilha sem autenticação
-            const apiUrl = 'https://institutoreciclar-my.sharepoint.com/:x:/g/personal/admin_institutoreciclar_onmicrosoft_com/EeoXLN5P2P9LuOkVdT10Nk0BQ2fx53aLjfepQMkD270aCg?e=njeHen'; // Substitua pelo seu endpoint público da planilha
-
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ produto })
-            }).then(response => response.json())
-            .then(data => {
-                console.log('Valor salvo na planilha: ', data);
-                alert("Produto salvo com sucesso!");
-                document.getElementById('dataForm').reset();
-            }).catch(error => console.error('Erro ao salvar na planilha: ', error));
-        });
-
-        // Função para calcular o valor total
-        function calcularValorTotal() {
-            const quantidade = document.getElementById('quantidade').value;
-            const valor_unitario = document.getElementById('valor_unitario').value;
-            const valor_total = quantidade * valor_unitario;
-            document.getElementById('valor_total').value = valor_total.toFixed(2);
-        }
-
-        // Função para limpar o formulário
-        function limparFormulario() {
-            document.getElementById('dataForm').reset();
-        }
-
-        // Função para ir para a home
-        function irParaHome() {
-            window.location.href = "./home.html"; // Substitua pelo caminho correto para a página inicial
-        }
-    </script>
 </body>
 </html>
