@@ -1,8 +1,6 @@
-// Função para enviar dados
 document.getElementById('dataForm').addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // Coletando os valores do formulário
     const sku = document.getElementById('sku').value;
     const descricao = document.getElementById('descricao').value;
     const tipo = document.getElementById('tipo').value;
@@ -15,7 +13,6 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
     const data_cadastro = document.getElementById('data_cadastro').value;
     const data_vencimento = document.getElementById('data_vencimento').value;
 
-    // Criação de um objeto com os dados do formulário
     const produto = {
         sku,
         descricao,
@@ -30,9 +27,6 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
         data_vencimento
     };
 
-
-    // Enviando os dados via POST para o Web App do Google Apps Script
-    // Fazer requisição POST para o Google Apps Script
     fetch("https://script.google.com/macros/s/AKfycbxM2WNFSr9VZyDibR8H4SQhApM-8t3tNFSdMP4zj_hIETjoegzudMHvVttrz8MTRS9gUA/exec", {
         method: "POST",
         mode: "cors",  // Garantir que a requisição seja feita com o modo CORS
@@ -52,6 +46,7 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
         console.error('Erro ao salvar produto: ', error);
     });
 });
+
 
 // Função para calcular o valor total
 function calcularValorTotal() {
