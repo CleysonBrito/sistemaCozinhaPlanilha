@@ -27,23 +27,28 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
         data_vencimento
     };
 
-    fetch("https://institutoreciclar-my.sharepoint.com/:x:/r/personal/admin_institutoreciclar_onmicrosoft_com/_layouts/15/Doc.aspx?sourcedoc=%7BDE2C17EA-D84F-4BFF-B8E9-15753D74364D%7D&file=Pasta.xlsx&action=editnew&mobileredirect=true&wdNewAndOpenCt=1729782763717&ct=1729782764785&wdOrigin=OFFICECOM-WEB.START.NEW&wdPreviousSessionSrc=HarmonyWeb&wdPreviousSession=ddd753a8-14c1-4777-9f7b-ce5ef8537aea&cid=8ef89d60-b0f4-4eaf-a0b1-877b476ddb1a", {
-        method: "POST",
-        mode: "cors",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(produto)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
+    msalInstance.acquireTokenSilent(loginRequest).then((tokenResponse) => {
+        const accessToken = tokenResponse.accessToken;
+        
+        const fileId = 'YOUR_FILE_ID'; // ID do arquivo da planilha no OneDrive
+        const sheet = 'Sheet1'; // Nome da aba da planilha
+        const apiUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/workbook/worksheets('${sheet}')/range(address='A1')`; // Modifique a célula conforme necessário
+
+        fetch(apiUrl, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                values: [[sku, descricao, tipo, unidade, grupo, quantidade, valor_unitario, valor_total, fornecedor, data_cadastro, data_vencimento]]
+            })
+        }).then(response => response.json())
+        .then(data => {
+            console.log('Valor salvo na planilha: ', data);
+            alert("Produto salvo com sucesso!");
             document.getElementById('dataForm').reset();
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao salvar produto: ', error);
+        }).catch(error => console.error('Erro ao salvar na planilha: ', error));
     });
 });
 
