@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="./IMAGENS/Logo Icone.ico" type="image/x-icon">
     <link rel="stylesheet" href="./ENTRADA_PRODUTOS/styles.css">
     <script src="./ENTRADA_PRODUTOS/app.js" defer></script>
-    script src="https://alcdn.msauth.net/browser/2.17.0/js/msal-browser.min.js"></script> 
+    <script src="https://alcdn.msauth.net/browser/2.17.0/js/msal-browser.min.js"></script> 
 </head>
 <body>
     <div class="header">
@@ -49,7 +49,7 @@
             <label for="valor_unitario">Valor Unitário (R$):</label>
             <input type="number" id="valor_unitario" required oninput="calcularValorTotal()" step="0.01">
             <label for="valor_total">Valor Total (R$):</label>
-            <input type="number" id="valor_total" required disabled>
+            <input type="number" id="valor_total" required readonly>
             <label for="fornecedor">Fornecedor:</label>
             <input type="text" id="fornecedor" required>
             <label for="data_cadastro">Data Cadastro:</label>
