@@ -2,61 +2,109 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Entrada</title>
-    <link rel="shortcut icon" href="./IMAGENS/Logo Icone.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./ENTRADA_PRODUTOS/styles.css">
-    <script src="./ENTRADA_PRODUTOS/app.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manipular Planilha no OneDrive</title>
 </head>
 <body>
-    <div class="header">
-        <img src="./IMAGENS/Reciclar_Logo_Principal_Vertical_Negativo.png" alt="Logo Esquerdo" class="logo">
-        <h1>ENTRADA</h1>
-        <img src="./IMAGENS/Layout.png" alt="Home" class="home-icon" onclick="irParaHome()">
-    </div>
-    <div class="container">
-        <form id="dataForm">
-            <label for="sku">SKU:</label>
-            <input type="text" id="sku" required>
-            <label for="descricao">Descrição:</label>
-            <input type="text" id="descricao" required>
-            <label for="tipo">Tipo:</label>
-            <select id="tipo" required>
-                <option value="FRUTA">FRUTA</option>
-                <option value="VERDURA">VERDURA</option>
-                <option value="LEGUMES">LEGUMES</option>
-                <option value="BOVINA">BOVINA</option>
-                <option value="AVE">AVE</option>
-                <option value="SUÍNA">SUÍNA</option>
-                <option value="PESCADO">PESCADO</option>
-                <option value="OVOS">OVOS</option>
-                <option value="MERCADO">MERCADO</option>
-            </select>
-            <label for="unidade">Unidade:</label>
-            <input type="text" id="unidade" required>
-            <label for="grupo">Grupo:</label>
-            <select id="grupo" required>
-                <option value="MANTIMENTOS">MANTIMENTOS</option>
-                <option value="HORTALIÇAS">HORTALIÇAS</option>
-                <option value="PROTEINAS">PROTEINAS</option>
-                <option value="DOAÇÕES">DOAÇÕES</option>
-            </select>
-            <label for="quantidade">Quantidade:</label>
-            <input type="number" id="quantidade" required oninput="calcularValorTotal()">
-            <label for="valor_unitario">Valor Unitário (R$):</label>
-            <input type="number" id="valor_unitario" required oninput="calcularValorTotal()" step="0.01">
-            <label for="valor_total">Valor Total (R$):</label>
-            <input type="number" id="valor_total" required disabled>
-            <label for="fornecedor">Fornecedor:</label>
-            <input type="text" id="fornecedor" required>
-            <label for="data_cadastro">Data Cadastro:</label>
-            <input type="date" id="data_cadastro" required>
-            <label for="data_vencimento">Data Vencimento:</label>
-            <input type="date" id="data_vencimento" required>
-            <button type="submit">Salvar</button>
-            <button type="button" onclick="limparFormulario()">Limpar</button>
-            <button type="button" onclick="irParaHome()">Voltar para Home</button>
-        </form>
-        <div id="output"></div>
-    </div>
+    <h1>Manipular Planilha no OneDrive</h1>
+
+    <button id="signin_button">Login</button>
+    <button id="signout_button" style="display:none;">Logout</button>
+
+    <form id="dataForm">
+        <label for="cell">Célula (Ex: A1):</label>
+        <input type="text" id="cell" required>
+        <label for="value">Valor:</label>
+        <input type="text" id="value" required>
+        <button type="submit">Salvar</button>
+    </form>
+
+    <button onclick="loadSpreadsheet()">Carregar Planilha</button>
+    <div id="spreadsheetData"></div>
+
+    <script src="https://alcdn.msauth.net/browser/2.17.0/js/msal-browser.min.js"></script>
+    <script>
+        // Configuração MSAL para autenticação com Microsoft
+        const msalConfig = {
+            auth: {
+                clientId: 'f5b921d8-3040-484a-868f-730eb2ed871f', // Substitua pelo Client ID do Azure
+                authority: 'https://login.microsoftonline.com/a9e5a3f6-15f5-4ef8-9924-023ddbb02b9d', // Substitua pelo Tenant ID
+                redirectUri: 'http://localhost'
+            }
+        };
+
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+        const loginRequest = {
+            scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"]
+        };
+
+        document.getElementById('signin_button').addEventListener('click', () => {
+            msalInstance.loginPopup(loginRequest)
+                .then((response) => {
+                    console.log("Login bem-sucedido", response);
+                    document.getElementById('signin_button').style.display = 'none';
+                    document.getElementById('signout_button').style.display = 'block';
+                })
+                .catch((error) => {
+                    console.error("Erro no login: ", error);
+                });
+        });
+
+        document.getElementById('signout_button').addEventListener('click', () => {
+            msalInstance.logout();
+        });
+
+        // Função para salvar valores na planilha
+        document.getElementById('dataForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const cell = document.getElementById('cell').value;
+            const value = document.getElementById('value').value;
+
+            msalInstance.acquireTokenSilent(loginRequest).then((tokenResponse) => {
+                const accessToken = tokenResponse.accessToken;
+
+                const fileId = 'https://institutoreciclar-my.sharepoint.com/:x:/g/personal/admin_institutoreciclar_onmicrosoft_com/EeoXLN5P2P9LuOkVdT10Nk0BQ2fx53aLjfepQMkD270aCg?e=0BY2g6'; // O ID do arquivo da planilha no OneDrive
+                const sheet = 'Sheet1'; // Nome da aba da planilha
+                const apiUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/workbook/worksheets('${sheet}')/range(address='${cell}')`;
+
+                fetch(apiUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: [[value]]
+                    })
+                }).then(response => response.json())
+                .then(data => {
+                    console.log('Valor salvo na planilha: ', data);
+                }).catch(error => console.error('Erro ao salvar na planilha: ', error));
+            });
+        });
+
+        // Função para carregar os dados da planilha
+        function loadSpreadsheet() {
+            msalInstance.acquireTokenSilent(loginRequest).then((tokenResponse) => {
+                const accessToken = tokenResponse.accessToken;
+
+                const fileId = 'https://institutoreciclar-my.sharepoint.com/:x:/g/personal/admin_institutoreciclar_onmicrosoft_com/EeoXLN5P2P9LuOkVdT10Nk0BQ2fx53aLjfepQMkD270aCg?e=0BY2g6'; // O ID do arquivo da planilha no OneDrive
+                const sheet = 'Sheet1'; // Nome da aba da planilha
+                const apiUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/workbook/worksheets('${sheet}')/usedRange`;
+
+                fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                }).then(response => response.json())
+                .then(data => {
+                    console.log('Dados da planilha: ', data);
+                    document.getElementById('spreadsheetData').innerText = JSON.stringify(data, null, 2);
+                }).catch(error => console.error('Erro ao carregar a planilha: ', error));
+            });
+        }
+    </script>
 </body>
 </html>
