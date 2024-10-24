@@ -40,14 +40,26 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             },
-            mode: 'no-cors', // Adiciona o modo no-cors
             body: JSON.stringify({
                 values: [[sku, descricao, tipo, unidade, grupo, quantidade, valor_unitario, valor_total, fornecedor, data_cadastro, data_vencimento]]
             })
-        }).then(response => {
-            console.log('Requisição enviada, porém resposta não pode ser processada devido ao no-cors.');
-        }).catch(error => console.error('Erro ao salvar na planilha: ', error));
-    });
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Valor salvo na planilha: ', data);
+            alert("Produto salvo com sucesso!");
+            document.getElementById('dataForm').reset();
+        })
+        .catch(error => {
+            console.error('Erro ao salvar na planilha: ', error);
+            alert(`Erro ao salvar na planilha: ${error.message}`);
+        });
+        
 });
 
 // Função para calcular o valor total
