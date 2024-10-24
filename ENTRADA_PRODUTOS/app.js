@@ -1,6 +1,6 @@
+// Função para enviar dados
 document.getElementById('dataForm').addEventListener('submit', (e) => {
     e.preventDefault();
-
     const sku = document.getElementById('sku').value;
     const descricao = document.getElementById('descricao').value;
     const tipo = document.getElementById('tipo').value;
@@ -13,6 +13,10 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
     const data_cadastro = document.getElementById('data_cadastro').value;
     const data_vencimento = document.getElementById('data_vencimento').value;
 
+    // Referência ao banco de dados
+    const db = firebase.database().ref('entradaprodutos');
+
+    // Dados a serem enviados
     const produto = {
         sku,
         descricao,
@@ -27,39 +31,15 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
         data_vencimento
     };
 
-    msalInstance.acquireTokenSilent(loginRequest).then((tokenResponse) => {
-        const accessToken = tokenResponse.accessToken;
-        
-        const fileId = 'https://institutoreciclar-my.sharepoint.com/:x:/g/personal/admin_institutoreciclar_onmicrosoft_com/EeoXLN5P2P9LuOkVdT10Nk0BQ2fx53aLjfepQMkD270aCg?e=FgzDKS'; // Substitua por apenas o ID do arquivo no OneDrive
-        const sheet = 'Sheet1'; // Nome da aba da planilha
-        const apiUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/workbook/worksheets('${sheet}')/range(address='A1')`; // Modifique a célula conforme necessário
-
-        fetch(apiUrl, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                values: [[sku, descricao, tipo, unidade, grupo, quantidade, valor_unitario, valor_total, fornecedor, data_cadastro, data_vencimento]]
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Valor salvo na planilha: ', data);
-            alert("Produto salvo com sucesso!");
+    // Enviar dados para o Firebase
+    db.push(produto)
+        .then(() => {
+            alert('Produto salvo com sucesso!');
             document.getElementById('dataForm').reset();
         })
-        .catch(error => {
-            console.error('Erro ao salvar na planilha: ', error);
-            alert(`Erro ao salvar na planilha: ${error.message}`);
+        .catch((error) => {
+            console.error('Erro ao salvar produto: ', error);
         });
-        
 });
 
 // Função para calcular o valor total
