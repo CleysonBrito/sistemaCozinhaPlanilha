@@ -1,6 +1,8 @@
 // Função para enviar dados
 document.getElementById('dataForm').addEventListener('submit', (e) => {
     e.preventDefault();
+
+    // Coletando os valores do formulário
     const sku = document.getElementById('sku').value;
     const descricao = document.getElementById('descricao').value;
     const tipo = document.getElementById('tipo').value;
@@ -13,11 +15,8 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
     const data_cadastro = document.getElementById('data_cadastro').value;
     const data_vencimento = document.getElementById('data_vencimento').value;
 
-    // Referência ao banco de dados
-    const db = firebase.database().ref('entradaprodutos');
-
-    // Dados a serem enviados
-    const produto = {
+    // Criação de um objeto com os dados do formulário
+    const formData = {
         sku,
         descricao,
         tipo,
@@ -31,15 +30,26 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
         data_vencimento
     };
 
-    // Enviar dados para o Firebase
-    db.push(produto)
-        .then(() => {
+    // Enviando os dados via POST para o Web App do Google Apps Script
+    fetch("https://script.google.com/macros/s/AKfycbxM2WNFSr9VZyDibR8H4SQhApM-8t3tNFSdMP4zj_hIETjoegzudMHvVttrz8MTRS9gUA/exec", {
+        method: 'POST',
+        mode: 'no-cors', // No-cors para evitar problemas de CORS
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData) // Convertendo os dados em JSON
+    })
+    .then(response => {
+        if (response.ok) {
             alert('Produto salvo com sucesso!');
-            document.getElementById('dataForm').reset();
-        })
-        .catch((error) => {
-            console.error('Erro ao salvar produto: ', error);
-        });
+            document.getElementById('dataForm').reset(); // Limpar o formulário
+        } else {
+            alert('Ocorreu um erro ao salvar o produto.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar produto: ', error);
+    });
 });
 
 // Função para calcular o valor total
