@@ -40,14 +40,12 @@ document.getElementById('dataForm').addEventListener('submit', (e) => {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             },
+            mode: 'no-cors', // Adiciona o modo no-cors
             body: JSON.stringify({
                 values: [[sku, descricao, tipo, unidade, grupo, quantidade, valor_unitario, valor_total, fornecedor, data_cadastro, data_vencimento]]
             })
-        }).then(response => response.json())
-        .then(data => {
-            console.log('Valor salvo na planilha: ', data);
-            alert("Produto salvo com sucesso!");
-            document.getElementById('dataForm').reset();
+        }).then(response => {
+            console.log('Requisição enviada, porém resposta não pode ser processada devido ao no-cors.');
         }).catch(error => console.error('Erro ao salvar na planilha: ', error));
     });
 });
