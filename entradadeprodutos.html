@@ -6,7 +6,6 @@
     <link rel="shortcut icon" href="./IMAGENS/Logo Icone.ico" type="image/x-icon">
     <link rel="stylesheet" href="./ENTRADA_PRODUTOS/styles.css">
     <script src="./ENTRADA_PRODUTOS/app.js" defer></script>
-    <script src="https://alcdn.msauth.net/browser/2.17.0/js/msal-browser.min.js"></script> 
 </head>
 <body>
     <div class="header">
@@ -15,10 +14,7 @@
         <img src="./IMAGENS/Layout.png" alt="Home" class="home-icon" onclick="irParaHome()">
     </div>
     <div class="container">
-        <button id="signin_button">Login</button>
-        <button id="signout_button" style="display:none;">Logout</button>
-        
-        <form id="dataForm" style="display:none;">
+        <form id="dataForm">
             <label for="sku">SKU:</label>
             <input type="text" id="sku" required>
             <label for="descricao">Descrição:</label>
@@ -62,70 +58,71 @@
         </form>
         <div id="output"></div>
     </div>
+
     <script>
-        // Configuração MSAL para autenticação com Microsoft
-        const msalConfig = {
-            auth: {
-                clientId: 'f5b921d8-3040-484a-868f-730eb2ed871f', // ID do aplicativo
-                authority: 'https://login.microsoftonline.com/a9e5a3f6-15f5-4ef8-9924-023ddbb02b9d', // ID do diretório
-                redirectUri: 'https://<seu-usuario>.github.io/<nome-do-repositorio>' // URI de redirecionamento para GitHub
-            },
-            cache: {
-                cacheLocation: "localStorage", // Mantém as credenciais no localStorage
-                storeAuthStateInCookie: true // Recomendado para evitar problemas de navegação
-            }
-        };
-    
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
-    
-        const loginRequest = {
-            scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"]
-        };
-    
-        // Função para login silencioso
-        function attemptSilentLogin() {
-            msalInstance.ssoSilent(loginRequest)
-                .then((response) => {
-                    console.log("Login silencioso bem-sucedido", response);
-                    showAppContent(response.account);
-                })
-                .catch((error) => {
-                    console.error("Login silencioso falhou, solicitando popup: ", error);
-                    loginWithPopup(); // Se falhar o login silencioso, exibe o popup
-                });
-        }
-    
-        // Função para login com popup
-        function loginWithPopup() {
-            msalInstance.loginPopup(loginRequest)
-                .then((response) => {
-                    console.log("Login via popup bem-sucedido", response);
-                    showAppContent(response.account);
-                })
-                .catch((error) => {
-                    console.error("Erro no login via popup: ", error);
-                });
-        }
-    
-        // Mostra o conteúdo da aplicação após login bem-sucedido
-        function showAppContent(account) {
-            document.getElementById('signin_button').style.display = 'none';
-            document.getElementById('signout_button').style.display = 'block';
-            document.getElementById('dataForm').style.display = 'block'; // Mostra o formulário após login
-            console.log("Usuário logado: ", account);
-        }
-    
-        // Logout
-        document.getElementById('signout_button').addEventListener('click', () => {
-            msalInstance.logout();
+        document.getElementById('dataForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const sku = document.getElementById('sku').value;
+            const descricao = document.getElementById('descricao').value;
+            const tipo = document.getElementById('tipo').value;
+            const unidade = document.getElementById('unidade').value;
+            const grupo = document.getElementById('grupo').value;
+            const quantidade = document.getElementById('quantidade').value;
+            const valor_unitario = document.getElementById('valor_unitario').value;
+            const valor_total = document.getElementById('valor_total').value;
+            const fornecedor = document.getElementById('fornecedor').value;
+            const data_cadastro = document.getElementById('data_cadastro').value;
+            const data_vencimento = document.getElementById('data_vencimento').value;
+
+            const produto = {
+                sku,
+                descricao,
+                tipo,
+                unidade,
+                grupo,
+                quantidade,
+                valor_unitario,
+                valor_total,
+                fornecedor,
+                data_cadastro,
+                data_vencimento
+            };
+
+            // Simulando o salvamento na planilha sem autenticação
+            const apiUrl = 'https://institutoreciclar-my.sharepoint.com/:x:/g/personal/admin_institutoreciclar_onmicrosoft_com/EeoXLN5P2P9LuOkVdT10Nk0BQ2fx53aLjfepQMkD270aCg?e=njeHen'; // Substitua pelo seu endpoint público da planilha
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ produto })
+            }).then(response => response.json())
+            .then(data => {
+                console.log('Valor salvo na planilha: ', data);
+                alert("Produto salvo com sucesso!");
+                document.getElementById('dataForm').reset();
+            }).catch(error => console.error('Erro ao salvar na planilha: ', error));
         });
-    
-        // Tenta o login silencioso ao carregar a página
-        attemptSilentLogin();
-    
-        // Botão para login manual via popup (caso seja necessário)
-        document.getElementById('signin_button').addEventListener('click', loginWithPopup);
+
+        // Função para calcular o valor total
+        function calcularValorTotal() {
+            const quantidade = document.getElementById('quantidade').value;
+            const valor_unitario = document.getElementById('valor_unitario').value;
+            const valor_total = quantidade * valor_unitario;
+            document.getElementById('valor_total').value = valor_total.toFixed(2);
+        }
+
+        // Função para limpar o formulário
+        function limparFormulario() {
+            document.getElementById('dataForm').reset();
+        }
+
+        // Função para ir para a home
+        function irParaHome() {
+            window.location.href = "./home.html"; // Substitua pelo caminho correto para a página inicial
+        }
     </script>
-    
 </body>
 </html>
