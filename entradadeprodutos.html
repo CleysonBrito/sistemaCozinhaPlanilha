@@ -68,32 +68,64 @@
             auth: {
                 clientId: 'f5b921d8-3040-484a-868f-730eb2ed871f', // ID do aplicativo
                 authority: 'https://login.microsoftonline.com/a9e5a3f6-15f5-4ef8-9924-023ddbb02b9d', // ID do diretório
-                redirectUri: 'https://cleysonbrito.github.io/sistemaCozinhaPlanilha/' // URI de redirecionamento
+                redirectUri: 'https://<seu-usuario>.github.io/<nome-do-repositorio>' // URI de redirecionamento para GitHub
+            },
+            cache: {
+                cacheLocation: "localStorage", // Mantém as credenciais no localStorage
+                storeAuthStateInCookie: true // Recomendado para evitar problemas de navegação
             }
         };
-
+    
         const msalInstance = new msal.PublicClientApplication(msalConfig);
-
+    
         const loginRequest = {
             scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"]
         };
-
-        document.getElementById('signin_button').addEventListener('click', () => {
-            msalInstance.loginPopup(loginRequest)
+    
+        // Função para login silencioso
+        function attemptSilentLogin() {
+            msalInstance.ssoSilent(loginRequest)
                 .then((response) => {
-                    console.log("Login bem-sucedido", response);
-                    document.getElementById('signin_button').style.display = 'none';
-                    document.getElementById('signout_button').style.display = 'block';
-                    document.getElementById('dataForm').style.display = 'block'; // Mostra o formulário após login
+                    console.log("Login silencioso bem-sucedido", response);
+                    showAppContent(response.account);
                 })
                 .catch((error) => {
-                    console.error("Erro no login: ", error);
+                    console.error("Login silencioso falhou, solicitando popup: ", error);
+                    loginWithPopup(); // Se falhar o login silencioso, exibe o popup
                 });
-        });
-
+        }
+    
+        // Função para login com popup
+        function loginWithPopup() {
+            msalInstance.loginPopup(loginRequest)
+                .then((response) => {
+                    console.log("Login via popup bem-sucedido", response);
+                    showAppContent(response.account);
+                })
+                .catch((error) => {
+                    console.error("Erro no login via popup: ", error);
+                });
+        }
+    
+        // Mostra o conteúdo da aplicação após login bem-sucedido
+        function showAppContent(account) {
+            document.getElementById('signin_button').style.display = 'none';
+            document.getElementById('signout_button').style.display = 'block';
+            document.getElementById('dataForm').style.display = 'block'; // Mostra o formulário após login
+            console.log("Usuário logado: ", account);
+        }
+    
+        // Logout
         document.getElementById('signout_button').addEventListener('click', () => {
             msalInstance.logout();
         });
+    
+        // Tenta o login silencioso ao carregar a página
+        attemptSilentLogin();
+    
+        // Botão para login manual via popup (caso seja necessário)
+        document.getElementById('signin_button').addEventListener('click', loginWithPopup);
     </script>
+    
 </body>
 </html>
