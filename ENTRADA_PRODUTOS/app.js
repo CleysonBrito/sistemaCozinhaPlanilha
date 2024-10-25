@@ -45,7 +45,7 @@ function calcularValorTotal() {
     document.getElementById('valor_total').value = valor_total.toFixed(2);
 }
 
-// Função para limpar o formulário
+// Função para limpar o formulário - 
 function limparFormulario() {
     document.getElementById('dataForm').reset();
 }
