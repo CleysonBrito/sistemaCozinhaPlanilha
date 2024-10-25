@@ -4,7 +4,7 @@ document.getElementById('dataForm').addEventListener('submit', async (e) => {
     //const sku = document.getElementById('sku').value;
     //const descricao = document.getElementById('descricao').value;
     //const tipo = document.getElementById('tipo').value;
-    const unidade = document.getElementById('unidade').value;
+    //const unidade = document.getElementById('unidade').value;
     const grupo = document.getElementById('grupo').value;
     const quantidade = document.getElementById('quantidade').value;
     const valor_unitario = document.getElementById('valor_unitario').value;
@@ -17,7 +17,7 @@ document.getElementById('dataForm').addEventListener('submit', async (e) => {
        // sku,
         //descricao,
         //tipo,
-        unidade,
+        //unidade,
         grupo,
         quantidade,
         valor_unitario,
