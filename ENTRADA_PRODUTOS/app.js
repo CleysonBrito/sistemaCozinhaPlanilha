@@ -1,8 +1,8 @@
 // Função para enviar dados
 document.getElementById('dataForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const sku = document.getElementById('sku').value;
-    const descricao = document.getElementById('descricao').value;
+    //const sku = document.getElementById('sku').value;
+    //const descricao = document.getElementById('descricao').value;
     const tipo = document.getElementById('tipo').value;
     const unidade = document.getElementById('unidade').value;
     const grupo = document.getElementById('grupo').value;
@@ -14,8 +14,8 @@ document.getElementById('dataForm').addEventListener('submit', async (e) => {
     const data_vencimento = document.getElementById('data_vencimento').value;
 
     const produto = {
-        sku,
-        descricao,
+       // sku,
+        //descricao,
         tipo,
         unidade,
         grupo,
