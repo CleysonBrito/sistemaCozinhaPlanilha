@@ -1,11 +1,7 @@
-// Configuração do Supabase
-const supabaseUrl = 'https://uccoosxvsjbquqdbadbj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjY29vc3h2c2picXVxZGJhZGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk4NjYyNzMsImV4cCI6MjA0NTQ0MjI3M30.sKZsTu8EZ6XwY_9yLuNzgiuCwpWcsCWiV92CZyHVxVA';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-// Função para enviar dados
 document.getElementById('dataForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const url = 'https://script.google.com/macros/s/AKfycby9rhIyLNb-SW51JZ5Y2c7p6yTpxu28GWRg_ljrdrQasFPrYMCim92QE6oT2UwNbQsDOA/exec';
+
     const produto = {
         sku: document.getElementById('sku').value,
         descricao: document.getElementById('descricao').value,
@@ -21,36 +17,30 @@ document.getElementById('dataForm').addEventListener('submit', async (e) => {
     };
 
     try {
-        const { data, error } = await supabase
-            .from('produtos')  // Nome da tabela no Supabase
-            .insert([produto]);
-
-        if (error) {
-            console.error('Erro ao salvar produto:', error);
-            alert('Erro ao salvar produto.');
-        } else {
-            alert('Produto salvo com sucesso!');
-            document.getElementById('dataForm').reset();
-        }
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(produto)
+        });
+        alert('Produto salvo com sucesso!');
+        document.getElementById('dataForm').reset();
     } catch (error) {
         console.error('Erro ao enviar dados:', error);
+        alert('Erro ao salvar produto.');
     }
 });
 
-// Função para calcular o valor total
 function calcularValorTotal() {
     const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
     const valor_unitario = parseFloat(document.getElementById('valor_unitario').value) || 0;
-    const valor_total = quantidade * valor_unitario;
-    document.getElementById('valor_total').value = valor_total.toFixed(2);
+    document.getElementById('valor_total').value = (quantidade * valor_unitario).toFixed(2);
 }
 
-// Função para limpar o formulário - 
 function limparFormulario() {
     document.getElementById('dataForm').reset();
 }
 
-// Função para ir para a home
 function irParaHome() {
-    window.location.href = "./home.html"; // Caminho para a página inicial
+    window.location.href = "./home.html";
 }
