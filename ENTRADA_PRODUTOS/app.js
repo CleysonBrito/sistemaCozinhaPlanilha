@@ -1,6 +1,6 @@
 document.getElementById('dataForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const url = 'https://script.google.com/macros/s/AKfycby9rhIyLNb-SW51JZ5Y2c7p6yTpxu28GWRg_ljrdrQasFPrYMCim92QE6oT2UwNbQsDOA/exec';
+    const url = 'https://script.google.com/macros/s/AKfycbz4QUW5MW7r2yDfzhO_YYXkwfc56aLr3ArpDxff8OzEFbdhUcdUBweyJEKWeRlCciOSsQ/exec';
 
     const produto = {
         sku: document.getElementById('sku').value,
