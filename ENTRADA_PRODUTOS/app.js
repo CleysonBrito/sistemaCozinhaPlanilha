@@ -19,15 +19,20 @@ document.getElementById('dataForm').addEventListener('submit', async (e) => {
     try {
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(produto)
         });
-        alert('Produto salvo com sucesso!');
+
+        if (!response.ok) {
+            throw new Error('Erro na resposta do servidor: ' + response.statusText);
+        }
+
+        const result = await response.json();
+        alert(result.message);
         document.getElementById('dataForm').reset();
     } catch (error) {
         console.error('Erro ao enviar dados:', error);
-        alert('Erro ao salvar produto.');
+        alert('Erro ao salvar produto: ' + error.message);
     }
 });
 
